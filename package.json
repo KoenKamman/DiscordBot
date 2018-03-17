@@ -23,7 +23,9 @@
   "homepage": "https://github.com/KoenKamman/DiscordBot#readme",
   "dependencies": {
     "discord.js": "^11.3.2",
-    "optional": "^0.1.4"
+    "optional": "^0.1.4",
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
     "nodemon": "^1.17.1"
