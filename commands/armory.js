@@ -22,8 +22,8 @@ module.exports = {
 					data.push(`\`\`\``);
 
 					data.push(`\`\`\`python`);
-					data.push(`Honorable Kills		${character.totalHonorableKills}`);
-					data.push(`Achievement Points	${character.achievementPoints}`);
+					data.push(`${character.totalHonorableKills} Honorable Kills`);
+					data.push(`${character.achievementPoints} Achievement Points`);
 					data.push(`\`\`\``);
 
 					message.channel.send(data);
