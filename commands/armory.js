@@ -12,21 +12,30 @@ module.exports = {
 	description: 'Armory info',
 	execute(message, args) {
 		if (args.length === 3) {
-			wow.getCharacter(args[2], args[1], args[0])
+
+			wow.getCharacterData(args[2], args[1], args[0])
 				.then((character) => {
 					const data = [];
 
-					data.push(`**Character Name:** ${character.name}`);
+					data.push(`\`\`\`python`);
+					data.push(`${character.name} | ${character.level} ${character.race} ${character.class} | ${character.realm} | ${character.faction} | ${character.region}`);
+					data.push(`\`\`\``);
+
+					data.push(`\`\`\`python`);
+					data.push(`Honorable Kills		${character.totalHonorableKills}`);
+					data.push(`Achievement Points	${character.achievementPoints}`);
+					data.push(`\`\`\``);
 
 					message.channel.send(data);
 				})
-				.catch((error) => {
-					if (error.statusCode === 404) {
+				.catch((result) => {
+					if (result.statusCode === 404) {
 						message.channel.send("Character not found.");
 					} else {
 						message.channel.send("Something went wrong.");
 					}
 				});
+
 		} else {
 			let reply = `You didn't provide enough arguments, ${message.author}!`;
 
@@ -34,7 +43,7 @@ module.exports = {
 				reply += `\nThe proper usage would be: \`${prefix}${this.name} ${this.usage}\``;
 			}
 
-			return message.channel.send(reply);
+			message.channel.send(reply);
 		}
 	}
 };
