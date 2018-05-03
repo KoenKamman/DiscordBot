@@ -1,5 +1,5 @@
-const wow = require('../services/wow');
-const {prefix} = require('../config.js');
+const wow = require('../../services/wow');
+const {prefix} = require('../../config.js');
 
 module.exports = {
 	name: 'armory',

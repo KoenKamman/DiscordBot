@@ -1,6 +1,6 @@
-const wow = require('../services/wow');
+const wow = require('../../services/wow');
 const Discord = require('discord.js');
-const {prefix} = require('../config.js');
+const {prefix} = require('../../config.js');
 
 module.exports = {
 	name: 'armory-embed',

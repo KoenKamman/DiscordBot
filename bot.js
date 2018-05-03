@@ -1,15 +1,20 @@
-const fs = require('fs');
+const { lstatSync, readdirSync } = require('fs');
+const { join } = require('path');
 const Discord = require('discord.js');
 const {prefix, discordToken} = require('./config.js');
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands');
 
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+const isDirectory = source => lstatSync(source).isDirectory();
+const getDirectories = source => readdirSync(source).map(name => join(source, name)).filter(isDirectory);
+for (const module of getDirectories('./command_modules')) {
+	const commandFiles = readdirSync(module);
+	for (const file of commandFiles) {
+		const command = require(join(__dirname, module, file));
+		client.commands.set(command.name, command);
+	}
 }
 
 client.on('ready', () => {
