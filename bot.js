@@ -1,83 +1,68 @@
-const { lstatSync, readdirSync } = require('fs');
-const { join } = require('path');
-const Discord = require('discord.js');
-const {prefix, discordToken} = require('./config.js');
+const path = require('path');
+const { CommandoClient } = require('discord.js-commando');
+const commando = require('discord.js-commando');
+const cfg = require('./config.js');
+const oneLine = require('common-tags').oneLine;
+const MongoClient = require('mongodb').MongoClient;
+const MongoDBProvider = require('commando-provider-mongo');
 
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-const cooldowns = new Discord.Collection();
-
-const isDirectory = source => lstatSync(source).isDirectory();
-const getDirectories = source => readdirSync(source).map(name => join(source, name)).filter(isDirectory);
-for (const module of getDirectories('./command_modules')) {
-	const commandFiles = readdirSync(module);
-	for (const file of commandFiles) {
-		const command = require(join(__dirname, module, file));
-		client.commands.set(command.name, command);
-	}
-}
-
-client.on('ready', () => {
-	client.user.setActivity('!help');
-	console.log('Ready!');
+const client = new CommandoClient({
+	commandPrefix: '!',
+	owner: '414137415947517953',
+	disableEveryone: true
 });
 
-client.on('message', message => {
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
+client
+	.on('error', console.error)
+	.on('warn', console.warn)
+	.on('debug', console.log)
+	.on('ready', () => {
+		console.log(`Client ready; logged in as ${client.user.username}#${client.user.discriminator} (${client.user.id})`);
+	})
+	.on('disconnect', () => { console.warn('Disconnected!'); })
+	.on('reconnecting', () => { console.warn('Reconnecting...'); })
+	.on('commandError', (cmd, err) => {
+		if(err instanceof commando.FriendlyError) return;
+		console.error(`Error in command ${cmd.groupID}:${cmd.memberName}`, err);
+	})
+	.on('commandBlocked', (msg, reason) => {
+		console.log(oneLine`
+			Command ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''}
+			blocked; ${reason}
+		`);
+	})
+	.on('commandPrefixChange', (guild, prefix) => {
+		console.log(oneLine`
+			Prefix ${prefix === '' ? 'removed' : `changed to ${prefix || 'the default'}`}
+			${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}.
+		`);
+	})
+	.on('commandStatusChange', (guild, command, enabled) => {
+		console.log(oneLine`
+			Command ${command.groupID}:${command.memberName}
+			${enabled ? 'enabled' : 'disabled'}
+			${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}.
+		`);
+	})
+	.on('groupStatusChange', (guild, group, enabled) => {
+		console.log(oneLine`
+			Group ${group.id}
+			${enabled ? 'enabled' : 'disabled'}
+			${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}.
+		`);
+	});
 
-	const args = message.content.slice(prefix.length).split(/ +/);
-	const commandName = args.shift().toLowerCase();
+client.setProvider(
+	MongoClient.connect(cfg.mongoUrl).then(client => new MongoDBProvider(client, cfg.mongoName))
+).catch(console.error);
 
-	const command = client.commands.get(commandName)
-		|| client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+client.registry
+	.registerGroups([
+		['administration', 'Administration'],
+		['moderation', 'Moderation'],
+		['world of warcraft', 'World of Warcraft']
+	])
+	.registerDefaults()
+	.registerCommandsIn(path.join(__dirname, 'commands'));
 
-	if (!command) return;
-
-	if (command.guildOnly && message.channel.type !== 'text') {
-		return message.reply('I can\'t execute that command inside DMs!');
-	}
-
-	if (command.args && !args.length) {
-		let reply = `You didn't provide any arguments, ${message.author}!`;
-
-		if (command.usage) {
-			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
-		}
-
-		return message.channel.send(reply);
-	}
-
-	if (!cooldowns.has(command.name)) {
-		cooldowns.set(command.name, new Discord.Collection());
-	}
-
-	const now = Date.now();
-	const timestamps = cooldowns.get(command.name);
-	const cooldownAmount = (command.cooldown || 3) * 1000;
-
-	if (!timestamps.has(message.author.id)) {
-		timestamps.set(message.author.id, now);
-		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-	}
-	else {
-		const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-		if (now < expirationTime) {
-			const timeLeft = (expirationTime - now) / 1000;
-			return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-		}
-
-		timestamps.set(message.author.id, now);
-		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-	}
-
-	try {
-		command.execute(message, args);
-	}
-	catch (error) {
-		console.error(error);
-		message.reply('there was an error trying to execute that command!');
-	}
-});
-
-client.login(discordToken);
+client.login(cfg.discordToken);
