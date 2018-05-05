@@ -40,7 +40,8 @@ module.exports = class ArmoryCommand extends Command {
 	}
 
 	async run(msg, { character, realm, region }) {
-		return wow.getCharacterData(region, realm, character)
+		const searchingMsg = await msg.say("Searching...");
+		return wow.getCharacter(region, realm, character)
 			.then((character) => {
 				let embed = new RichEmbed()
 					.setTitle(`${character.name} | ${character.level} ${character.race} ${character.class} | ${character.realm} | ${character.faction} | ${character.region}`)
@@ -58,13 +59,14 @@ module.exports = class ArmoryCommand extends Command {
 					embed.setColor("#eecd20")
 				}
 
+				searchingMsg.delete();
 				return msg.embed(embed);
 			})
 			.catch((result) => {
 				if (result.statusCode === 404) {
-					return msg.say("Character not found.");
+					return searchingMsg.edit("Character not found.");
 				} else {
-					return msg.say("Something went wrong.");
+					return searchingMsg.edit("Something went wrong.");
 				}
 			});
 	}
