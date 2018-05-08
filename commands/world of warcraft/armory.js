@@ -39,7 +39,8 @@ module.exports = class ArmoryCommand extends Command {
 	}
 
 	async run(msg, { character, realm, region }) {
-		return wow.getCharacterData(region, realm, character)
+		const searchingMsg = await msg.say("Searching...");
+		return wow.getCharacter(region, realm, character)
 			.then((character) => {
 				const data = [];
 
@@ -52,13 +53,13 @@ module.exports = class ArmoryCommand extends Command {
 				data.push(`${character.achievementPoints} Achievement Points`);
 				data.push(`\`\`\``);
 
-				return msg.say(data);
+				return searchingMsg.edit(data);
 			})
 			.catch((result) => {
 				if (result.statusCode === 404) {
-					return msg.say("Character not found.");
+					return searchingMsg.edit("Character not found.");
 				} else {
-					return msg.say("Something went wrong.");
+					return searchingMsg.edit("Something went wrong.");
 				}
 			});
 	}
