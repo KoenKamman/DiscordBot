@@ -60,7 +60,8 @@ client.registry
 	.registerGroups([
 		['administration', 'Administration'],
 		['moderation', 'Moderation'],
-		['world of warcraft', 'World of Warcraft']
+		['world of warcraft', 'World of Warcraft'],
+		['music', 'Music']
 	])
 	.registerDefaults()
 	.registerCommandsIn(path.join(__dirname, 'commands'));
