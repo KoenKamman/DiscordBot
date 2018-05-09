@@ -1,6 +1,5 @@
 const { Command } = require('discord.js-commando');
-const youtube = require('../../services/youtube.js');
-const ytdl = require('ytdl-core');
+const yt = require('../../services/youtube.js');
 
 module.exports = class PlayCommand extends Command {
 	constructor(client) {
@@ -10,7 +9,7 @@ module.exports = class PlayCommand extends Command {
 			group: 'music',
 			memberName: 'play',
 			description: 'Connects to a voice channel and starts playing music',
-			examples: ['play'],
+			examples: ['play [youtube-url/audio-stream-url]'],
 			throttling: {
 				usages: 2,
 				duration: 10
@@ -18,7 +17,7 @@ module.exports = class PlayCommand extends Command {
 			args: [
 				{
 					key: 'url',
-					prompt: 'What is the stream url?',
+					prompt: 'What is the youtube/radio url?',
 					type: 'string'
 				}
 			]
@@ -32,15 +31,15 @@ module.exports = class PlayCommand extends Command {
 			channel.join()
 				.then((connection) => {
 					let stream;
-					if(youtube.isValidYouTubeUrl(url)) {
-						stream = ytdl(url, {filter: 'audioonly'});
+					if(yt.isValidUrl(url)) {
+						stream = yt.getAudioStreamFromUrl(url);
 					} else {
 						stream = url;
 					}
 					const dispatcher = connection.playStream(stream, streamOptions);
-					this.client.on('voiceStateUpdate', (oldMember, newMember) => {
-						const channelmembers = Array.from(connection.channel.members.values());
-						if (channelmembers.length === 1) {
+					this.client.on('voiceStateUpdate', () => {
+						const channelMembers = Array.from(connection.channel.members.values());
+						if (channelMembers.length === 1) {
 							channel.leave();
 						}
 					});
