@@ -38,8 +38,11 @@ module.exports = class PlayCommand extends Command {
 						stream = url;
 					}
 					const dispatcher = connection.playStream(stream, streamOptions);
-					dispatcher.on('end', () => {
-						console.log('ended');
+					this.client.on('voiceStateUpdate', (oldMember, newMember) => {
+						const channelmembers = Array.from(connection.channel.members.values());
+						if (channelmembers.length === 1) {
+							channel.leave();
+						}
 					});
 					connection.on('disconnect', () => {
 						dispatcher.end();

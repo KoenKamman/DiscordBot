@@ -1,5 +1,5 @@
 const path = require('path');
-const { CommandoClient } = require('discord.js-commando');
+const {CommandoClient} = require('discord.js-commando');
 const commando = require('discord.js-commando');
 const cfg = require('./config.js');
 const oneLine = require('common-tags').oneLine;
@@ -19,10 +19,14 @@ client
 	.on('ready', () => {
 		console.log(`Client ready; logged in as ${client.user.username}#${client.user.discriminator} (${client.user.id})`);
 	})
-	.on('disconnect', () => { console.warn('Disconnected!'); })
-	.on('reconnecting', () => { console.warn('Reconnecting...'); })
+	.on('disconnect', () => {
+		console.warn('Disconnected!');
+	})
+	.on('reconnecting', () => {
+		console.warn('Reconnecting...');
+	})
 	.on('commandError', (cmd, err) => {
-		if(err instanceof commando.FriendlyError) return;
+		if (err instanceof commando.FriendlyError) return;
 		console.error(`Error in command ${cmd.groupID}:${cmd.memberName}`, err);
 	})
 	.on('commandBlocked', (msg, reason) => {
