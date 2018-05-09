@@ -61,7 +61,7 @@ client.registry
 		['administration', 'Administration'],
 		['moderation', 'Moderation'],
 		['world of warcraft', 'World of Warcraft'],
-		['ik', 'ik_ihe']
+		['reddit', 'reddit']
 	])
 	.registerDefaults()
 	.registerCommandsIn(path.join(__dirname, 'commands'));

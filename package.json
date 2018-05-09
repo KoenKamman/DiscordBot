@@ -29,6 +29,7 @@
     "escape-string-regexp": "^1.0.5",
     "mongodb": "^3.0.7",
     "optional": "^0.1.4",
+    "request": "^2.85.0",
     "request-promise-native": "^1.0.5",
     "require-all": "^2.2.0"
   },
