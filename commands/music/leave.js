@@ -7,7 +7,7 @@ module.exports = class LeaveCommand extends Command {
 			aliases: [],
 			group: 'music',
 			memberName: 'leave',
-			description: 'streams radio',
+			description: 'Disconnects from the voice channel',
 			examples: ['leave'],
 			throttling: {
 				usages: 2,

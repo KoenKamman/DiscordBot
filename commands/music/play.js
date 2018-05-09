@@ -1,4 +1,6 @@
 const { Command } = require('discord.js-commando');
+const youtube = require('../../services/youtube.js');
+const ytdl = require('ytdl-core');
 
 module.exports = class PlayCommand extends Command {
 	constructor(client) {
@@ -7,7 +9,7 @@ module.exports = class PlayCommand extends Command {
 			aliases: [],
 			group: 'music',
 			memberName: 'play',
-			description: 'streams radio',
+			description: 'Connects to a voice channel and starts playing music',
 			examples: ['play'],
 			throttling: {
 				usages: 2,
@@ -25,15 +27,26 @@ module.exports = class PlayCommand extends Command {
 
 	async run(msg, { url }) {
 		const channel = msg.member.voiceChannel;
-		const broadcast = this.client.createVoiceBroadcast();
-		channel.join()
-			.then((connection) => {
-				const dispatcher = broadcast.playStream(url, {volume: 0.1});
-				connection.playBroadcast(broadcast);
-				connection.on('disconnect', () => {
-					dispatcher.end();
-					broadcast.destroy();
+		const streamOptions = {volume: 0.1};
+		if (channel) {
+			channel.join()
+				.then((connection) => {
+					let stream;
+					if(youtube.isValidYouTubeUrl(url)) {
+						stream = ytdl(url, {filter: 'audioonly'});
+					} else {
+						stream = url;
+					}
+					const dispatcher = connection.playStream(stream, streamOptions);
+					dispatcher.on('end', () => {
+						console.log('ended');
+					});
+					connection.on('disconnect', () => {
+						dispatcher.end();
+					});
 				});
-			});
+		} else {
+			msg.reply("please join a voice channel!");
+		}
 	}
 };

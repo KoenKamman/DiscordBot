@@ -27,14 +27,16 @@
     "discord.js": "^11.3.2",
     "discord.js-commando": "^0.10.0",
     "escape-string-regexp": "^1.0.5",
-    "mongodb": "^3.0.7",
+    "ffmpeg-binaries": "^3.2.2-3",
+    "mongodb": "^3.0.8",
     "node-opus": "^0.3.0",
     "optional": "^0.1.4",
     "request": "^2.85.0",
     "request-promise-native": "^1.0.5",
-    "require-all": "^2.2.0"
+    "require-all": "^2.2.0",
+    "ytdl-core": "^0.20.3"
   },
   "devDependencies": {
-    "nodemon": "^1.17.1"
+    "nodemon": "^1.17.4"
   }
 }
