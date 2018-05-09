@@ -27,6 +27,7 @@
     "discord.js": "^11.3.2",
     "discord.js-commando": "^0.10.0",
     "escape-string-regexp": "^1.0.5",
+    "moment-timezone": "^0.5.16",
     "mongodb": "^3.0.7",
     "optional": "^0.1.4",
     "request": "^2.85.0",
