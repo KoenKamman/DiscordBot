@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
 const { RichEmbed } = require('discord.js');
 const rp = require('request-promise-native');
+const utility = require('../../services/utility.js')
 
 let options = {
     method: 'GET',
@@ -8,7 +9,7 @@ let options = {
     json: true
 }
 
-module.exports = class TestCommand extends Command{
+module.exports = class RedditCommand extends Command{
     constructor(client) {
 		super(client, {
 			name: 'reddit',
@@ -29,7 +30,8 @@ module.exports = class TestCommand extends Command{
                 {
                     key: 'post',
                     prompt: 'what post(number) should I get?',
-                    type: 'string'
+                    type: 'string',
+                    default: '1'
                 }
             ]
 		});
@@ -38,10 +40,15 @@ module.exports = class TestCommand extends Command{
     
     async run(msg, {reddit, post}){
         const searchingMsg = await msg.say("Searching...");
+        let number = post
+        if(post == 'random'){
+            number = utility.random(1, 10)
+        }
+
         options.uri = 'http://www.reddit.com/r/' + reddit + '/hot.json?'
         rp(options)
             .then((result) => {
-                searchingMsg.edit('https://www.reddit.com' + result.data.children[post || 1].data.permalink)
+                searchingMsg.edit('https://www.reddit.com' + result.data.children[number].data.permalink)
             })
             .catch((err) => {
                 console.log(err)
