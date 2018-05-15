@@ -31,7 +31,7 @@ module.exports = class RedditCommand extends Command{
                     key: 'post',
                     prompt: 'what post(number) should I get?',
                     type: 'string',
-                    default: '1'
+                    default: '0'
                 }
             ]
 		});
